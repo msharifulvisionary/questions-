@@ -539,9 +539,15 @@
                 subs.push(newSub);
             }
 
-            await update(ref(db, "questionBank/" + window.state.year), { subjects: subs });
-            resetForm();
-            setDashTab(window.state.year);
+            try {
+                await set(ref(db, "questionBank/" + window.state.year), { ...window.state.cache, subjects: subs });
+                alert('সফলভাবে সেভ হয়েছে!');
+                resetForm();
+                setDashTab(window.state.year);
+            } catch(error) {
+                console.error('Error saving subject:', error);
+                alert('সেভ করতে ত্রুটি হয়েছে: ' + error.message);
+            }
         };
 
         window.renderAdminSubList = () => {
@@ -583,8 +589,14 @@
         window.deleteSub = async (id) => {
             if(!confirm('মুছে ফেলবেন?')) return;
             const subs = (window.state.cache.subjects || []).filter(x => x.id !== id);
-            await update(ref(db, "questionBank/" + window.state.year), { subjects: subs });
-            setDashTab(window.state.year);
+            try {
+                await set(ref(db, "questionBank/" + window.state.year), { ...window.state.cache, subjects: subs });
+                alert('সফলভাবে মুছে ফেলা হয়েছে!');
+                setDashTab(window.state.year);
+            } catch(error) {
+                console.error('Error deleting subject:', error);
+                alert('মুছতে ত্রুটি হয়েছে: ' + error.message);
+            }
         };
 
         window.renderExamEditor = () => {
@@ -617,9 +629,14 @@
                 const id = d.getAttribute('data-id');
                 if(d.value || links[i].value) updates[id] = { date: d.value, link: links[i].value };
             });
-            await update(ref(db, "questionBank/" + window.state.year), { [type]: updates });
-            alert('সফলভাবে আপডেট হয়েছে!');
-            setDashTab(window.state.year);
+            try {
+                await set(ref(db, "questionBank/" + window.state.year), { ...window.state.cache, [type]: updates });
+                alert('সফলভাবে আপডেট হয়েছে!');
+                setDashTab(window.state.year);
+            } catch(error) {
+                console.error('Error saving exam updates:', error);
+                alert('আপডেট করতে ত্রুটি হয়েছে: ' + error.message);
+            }
         };
 
         // --- UTILS ---
